@@ -1,0 +1,17 @@
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: agendamento_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password_segura
+      POSTGRES_DB: agendamento_clinica
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+    name: agendamento_pgdata
