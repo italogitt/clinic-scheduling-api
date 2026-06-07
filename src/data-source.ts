@@ -7,14 +7,14 @@ dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: "127.0.0.1",
+  host: "localhost",
   port: 5433,
   username: "admin",
   password: "admin_password_segura",
   database: "agendamento_clinica",
 
   synchronize: true,
-  logging: true,
+  logging: false,
 
   entities: [User],
   migrations: [],
