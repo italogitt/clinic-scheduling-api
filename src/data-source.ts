@@ -6,8 +6,8 @@ dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: "localhost",
-  port: 5432,
+  host: "127.0.0.1",
+  port: 5433,
   username: "admin",
   password: "admin_password_segura",
   database: "agendamento_clinica",
