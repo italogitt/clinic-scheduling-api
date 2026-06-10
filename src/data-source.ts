@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
-import { User } from "../entities/user.js";
-import { Service } from "../entities/service.js";
-import { Appointment } from "../entities/appointment.js";
+import { User } from "./entities/user.js";
+import { Service } from "./entities/service.js";
+import { Appointment } from "./entities/appointment.js";
 
 dotenv.config();
 
