@@ -20,4 +20,20 @@ export class UserController {
       return res.status(500).json({ error: "Internal Server Error" });
     }
   }
+
+  async findAll(req: Request, res: Response) {
+    try {
+      const userService = new UserService();
+      const users = await userService.findAll();
+
+      const usersWithoutPassword = users.map((user) => {
+        const { password_hash, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+
+      return res.status(200).json(usersWithoutPassword);
+    } catch {
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
 }
