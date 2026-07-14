@@ -3,6 +3,7 @@ import { User } from "../entities/user.js";
 import { hashPassword } from "./ArgonService.js";
 
 type CreateUserRequest = Pick<User, "name" | "email" | "phone"> & { password: string };
+type UserSelectedId = { user_id: string };
 
 export class UserService {
   async execute({ name, email, phone, password }: CreateUserRequest): Promise<User> {
@@ -34,5 +35,16 @@ export class UserService {
     const finddedUsers = userRepository.find();
 
     return finddedUsers;
+  }
+
+  async delete({ user_id }: UserSelectedId) {
+    const userRepository = AppDataSource.getRepository(User);
+
+    const userExists = await userRepository.findOneBy({ user_id });
+
+    if (!userExists) {
+      throw new Error("User not found");
+    }
+    await userRepository.delete(user_id);
   }
 }
