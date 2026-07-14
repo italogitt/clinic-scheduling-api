@@ -1,24 +1,20 @@
 import express from "express";
 import { AppDataSource } from "./data-source.js";
+import { UserController } from "./controllers/UserController.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.json({
-    message: "API de agendamento operando com sucesso",
-  });
-});
+const userController = new UserController();
+
+app.post("/users", (req, res) => userController.create(req, res));
+app.get("/users", (req, res) => userController.findAll(req, res));
 
 AppDataSource.initialize()
   .then(() => {
-    console.log("Banco de dados conectado com sucesso");
-
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
-    });
+    console.log("Running");
+    app.listen(3000);
   })
   .catch((error) => {
     console.error("Erro fatal ao conectar com o banco de dados", error);
