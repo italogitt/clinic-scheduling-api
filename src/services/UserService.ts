@@ -4,6 +4,7 @@ import { hashPassword } from "./ArgonService.js";
 
 type CreateUserRequest = Pick<User, "name" | "email" | "phone"> & { password: string };
 type UserSelectedId = { user_id: string };
+type UpdateUserRequest = Partial<Pick<User, "name" | "email" | "phone">>;
 
 export class UserService {
   async execute({ name, email, phone, password }: CreateUserRequest): Promise<User> {
@@ -32,12 +33,49 @@ export class UserService {
   async findAll(): Promise<User[]> {
     const userRepository = AppDataSource.getRepository(User);
 
-    const finddedUsers = userRepository.find();
+    const foundUsers = await userRepository.find();
 
-    return finddedUsers;
+    return foundUsers;
   }
 
-  async delete({ user_id }: UserSelectedId) {
+  async findById({ user_id }: UserSelectedId): Promise<User> {
+    const userRepository = AppDataSource.getRepository(User);
+
+    const foundUser = await userRepository.findOneBy({ user_id });
+
+    if (!foundUser) {
+      throw new Error("User not found");
+    }
+    return foundUser;
+  }
+
+  async update(
+    { user_id }: UserSelectedId,
+    { name, email, phone }: UpdateUserRequest,
+  ): Promise<User> {
+    const userRepository = AppDataSource.getRepository(User);
+
+    const user = await userRepository.findOneBy({ user_id });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (email && email !== user.email) {
+      const emailInUse = await userRepository.findOneBy({ email });
+      if (emailInUse) {
+        throw new Error("Email already in use");
+      }
+    }
+
+    user.name = name ?? user.name;
+    user.email = email ?? user.email;
+    user.phone = phone ?? user.phone;
+
+    return await userRepository.save(user);
+  }
+
+  async delete({ user_id }: UserSelectedId): Promise<void> {
     const userRepository = AppDataSource.getRepository(User);
 
     const userExists = await userRepository.findOneBy({ user_id });
@@ -45,6 +83,6 @@ export class UserService {
     if (!userExists) {
       throw new Error("User not found");
     }
-    await userRepository.delete(user_id);
+    await userRepository.remove(userExists);
   }
 }
