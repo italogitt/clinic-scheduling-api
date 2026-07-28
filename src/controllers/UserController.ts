@@ -5,14 +5,11 @@ export class UserController {
   async create(req: Request, res: Response): Promise<Response> {
     try {
       const userService = new UserService();
-
       const { name, email, phone, password } = req.body;
 
       const user = await userService.execute({ name, email, phone, password });
 
-      const { password_hash, ...userWithoutPassword } = user;
-
-      return res.status(201).json(userWithoutPassword);
+      return res.status(201).json(user);
     } catch (error) {
       if (error instanceof Error) {
         return res.status(400).json({ error: error.message });
@@ -21,18 +18,78 @@ export class UserController {
     }
   }
 
-  async findAll(req: Request, res: Response) {
+  async findAll(req: Request, res: Response): Promise<Response> {
     try {
       const userService = new UserService();
       const users = await userService.findAll();
 
-      const usersWithoutPassword = users.map((user) => {
-        const { password_hash, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      });
+      return res.status(200).json(users);
+    } catch (error) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
 
-      return res.status(200).json(usersWithoutPassword);
-    } catch {
+  async findById(req: Request, res: Response): Promise<Response> {
+    try {
+      const userService = new UserService();
+      const { user_id } = req.params;
+
+      if (!user_id || typeof user_id !== "string") {
+        return res.status(400).json({ error: "Invalid or missing user ID" });
+      }
+
+      const user = await userService.findById({ user_id });
+
+      return res.status(200).json(user);
+    } catch (error) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+      return res.status(500).json({ error: "Internal server error " });
+    }
+  }
+
+  async update(req: Request, res: Response): Promise<Response> {
+    try {
+      const userService = new UserService();
+      const { user_id } = req.params;
+
+      if (!user_id || typeof user_id !== "string") {
+        return res.status(400).json({ error: "Invalid or missing user ID" });
+      }
+
+      const { name, email, phone } = req.body;
+
+      const user = await userService.update({ user_id }, { name, email, phone });
+
+      return res.status(200).json(user);
+    } catch (error) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+      return res.status(500).json({ error: "Internal server error " });
+    }
+  }
+
+  async delete(req: Request, res: Response): Promise<Response> {
+    try {
+      const userService = new UserService();
+      const { user_id } = req.params;
+
+      if (!user_id || typeof user_id !== "string") {
+        return res.status(400).json({ error: "Invalid or missing user ID" });
+      }
+
+      await userService.delete({ user_id });
+
+      return res.status(200).json({ message: "User succesfully deleted" });
+    } catch (error) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
       return res.status(500).json({ error: "Internal server error" });
     }
   }
