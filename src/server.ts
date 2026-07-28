@@ -9,7 +9,13 @@ app.use(express.json());
 const userController = new UserController();
 
 app.post("/users", (req, res) => userController.create(req, res));
+
 app.get("/users", (req, res) => userController.findAll(req, res));
+app.get("/users/:user_id", (req, res) => userController.findById(req, res));
+
+app.put("/users/:user_id", (req, res) => userController.update(req, res));
+
+app.delete("/users/:user_id", (req, res) => userController.delete(req, res));
 
 AppDataSource.initialize()
   .then(() => {
