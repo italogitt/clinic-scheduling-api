@@ -1,7 +1,7 @@
 import { AppDataSource } from "../data-source.js";
 import { User } from "../entities/user.js";
 import { verifyPassword } from "./ArgonService.js";
-import { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 type VerifyUserRequest = {
   email: string;
@@ -42,7 +42,7 @@ export class AuthService {
       throw new Error("JWT_SECRET is not configured");
     }
 
-    const token = sign({}, secret, {
+    const token = jwt.sign({}, secret, {
       subject: foundUser.user_id,
       expiresIn: "1d",
     });
