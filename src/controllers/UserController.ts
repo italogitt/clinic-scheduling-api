@@ -41,6 +41,10 @@ export class UserController {
         return res.status(400).json({ error: "Invalid or missing user ID" });
       }
 
+      if (req.params.user_id !== req.user_id) {
+        return res.status(403).json({ error: "Unauthorized access " });
+      }
+
       const user = await userService.findById({ user_id });
 
       return res.status(200).json(user);
@@ -63,8 +67,11 @@ export class UserController {
 
       const { name, email, phone } = req.body;
 
-      const user = await userService.update({ user_id }, { name, email, phone });
+      if (req.params.user_id !== req.user_id) {
+        return res.status(403).json({ error: "Unauthorized accses" });
+      }
 
+      const user = await userService.update({ user_id }, { name, email, phone });
       return res.status(200).json(user);
     } catch (error) {
       if (error instanceof Error) {
@@ -83,8 +90,11 @@ export class UserController {
         return res.status(400).json({ error: "Invalid or missing user ID" });
       }
 
-      await userService.delete({ user_id });
+      if (req.params.user_id !== req.user_id) {
+        return res.status(403).json({ error: "Unauthorized access" });
+      }
 
+      await userService.delete({ user_id });
       return res.status(200).json({ message: "User succesfully deleted" });
     } catch (error) {
       if (error instanceof Error) {
