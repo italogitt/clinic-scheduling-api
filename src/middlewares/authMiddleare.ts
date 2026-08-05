@@ -22,14 +22,13 @@ export class AuthMiddleware {
 
       const [scheme, token] = parts;
 
-      if (!token) {
+      if (!scheme || !token) {
         return res.status(401).json({ error: "Token missing or malformatted" });
       }
 
       if (!/^Bearer$/i.test(scheme)) {
         return res.status(401).json({ error: "Token malformatted" });
       }
-
       const secret = process.env.JWT_SECRET;
 
       if (!secret) {
