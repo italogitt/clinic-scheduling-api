@@ -20,6 +20,9 @@ export class Service {
   @Column({ type: "int" })
   duration_minutes: number;
 
+  @Column({ type: "boolean", default: true })
+  active: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 
