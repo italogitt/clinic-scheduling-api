@@ -21,7 +21,7 @@ export enum AppointmentStatus {
 @Entity("appointment")
 export class Appointment {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  appointment_id: string;
 
   @Column({ type: "timestamp" })
   service_date: Date;
