@@ -211,17 +211,10 @@ export class AppointmentService {
   }
 
   async cancel({ user_id, appointment_id }: CancelAppointmentDTO): Promise<Appointment> {
-    const userRepository = AppDataSource.getRepository(User);
     const appointmentRepository = AppDataSource.getRepository(Appointment);
 
     if (!user_id) {
       throw new Error("User ID is required");
-    }
-
-    const foundUser = await userRepository.findOneBy({ user_id });
-
-    if (!foundUser) {
-      throw new Error("User not found");
     }
 
     if (!appointment_id) {
