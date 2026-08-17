@@ -45,7 +45,7 @@ export class UserController {
         return res.status(403).json({ error: "Unauthorized access " });
       }
 
-      const user = await userService.findById({ user_id });
+      const user = await userService.findById(user_id);
 
       return res.status(200).json(user);
     } catch (error) {

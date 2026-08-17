@@ -7,7 +7,12 @@ type UserSelectedId = { user_id: string };
 type UpdateUserRequest = Partial<Pick<User, "name" | "email" | "phone">>;
 
 export class UserService {
-  async execute({ name, email, phone, password }: CreateUserRequest): Promise<User> {
+  async execute({
+    name,
+    email,
+    phone,
+    password,
+  }: CreateUserRequest): Promise<Omit<User, "password_hash">> {
     const userRepository = AppDataSource.getRepository(User);
 
     const userAlreadyExists = await userRepository.findOneBy({ email });
@@ -27,7 +32,9 @@ export class UserService {
 
     await userRepository.save(user);
 
-    return user;
+    const { password_hash, ...userWhitoutPassword } = user;
+
+    return userWhitoutPassword;
   }
 
   async findAll(): Promise<User[]> {
@@ -38,7 +45,7 @@ export class UserService {
     return foundUsers;
   }
 
-  async findById({ user_id }: UserSelectedId): Promise<User> {
+  async findById(user_id: string): Promise<User> {
     const userRepository = AppDataSource.getRepository(User);
 
     const foundUser = await userRepository.findOneBy({ user_id });
@@ -83,6 +90,9 @@ export class UserService {
     if (!userExists) {
       throw new Error("User not found");
     }
-    await userRepository.remove(userExists);
+
+    userExists.active = false;
+
+    await userRepository.save(userExists);
   }
 }
