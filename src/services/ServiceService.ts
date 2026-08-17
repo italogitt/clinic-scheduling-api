@@ -8,6 +8,10 @@ export class ServiceService {
   async execute({ name, price, duration_minutes }: CreateServiceRequest): Promise<Service> {
     const serviceRepository = AppDataSource.getRepository(Service);
 
+    if (!name || name.trim().length === 0) {
+      throw new Error("Service name is required");
+    }
+
     if (price <= 0 || duration_minutes <= 0) {
       throw new Error("Price and duration in minutes need to be greater than zero");
     }
