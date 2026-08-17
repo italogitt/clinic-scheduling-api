@@ -10,18 +10,15 @@ type CreateAppointmentDTO = {
   service_date: Date | string;
 };
 
-type FindByUserDTO = {
-  user_id: string;
-};
-
 type UpdateAppointmentDTO = {
-  user_id: string;
   service_id: string;
   appointment_id: string;
   service_date: Date | string;
+  user_id: string;
 };
 
 type CancelAppointmentDTO = {
+  user_id: string;
   appointment_id: string;
 };
 
@@ -109,7 +106,7 @@ export class AppointmentService {
     return appointments;
   }
 
-  async findByUser({ user_id }: FindByUserDTO): Promise<Appointment[]> {
+  async findByUser(user_id: string): Promise<Appointment[]> {
     const appointmentRepository = AppDataSource.getRepository(Appointment);
 
     const appointment = await appointmentRepository.find({
@@ -127,10 +124,10 @@ export class AppointmentService {
   }
 
   async update({
-    user_id,
     service_id,
     appointment_id,
     service_date,
+    user_id,
   }: UpdateAppointmentDTO): Promise<Appointment> {
     const appointmentRepository = AppDataSource.getRepository(Appointment);
     const userRepository = AppDataSource.getRepository(User);
@@ -157,10 +154,17 @@ export class AppointmentService {
       throw new Error("User not found");
     }
 
-    const appointment = await appointmentRepository.findOneBy({ appointment_id });
+    const appointment = await appointmentRepository.findOne({
+      where: { appointment_id },
+      relations: { user: true },
+    });
 
     if (!appointment) {
       throw new Error("Appointment not found");
+    }
+
+    if (appointment.user.user_id !== user_id) {
+      throw new Error("You can only update your own appointments");
     }
 
     const foundService = await serviceRepository.findOneBy({ service_id });
@@ -206,17 +210,35 @@ export class AppointmentService {
     return await appointmentRepository.save(appointment);
   }
 
-  async cancel({ appointment_id }: CancelAppointmentDTO): Promise<Appointment> {
+  async cancel({ user_id, appointment_id }: CancelAppointmentDTO): Promise<Appointment> {
+    const userRepository = AppDataSource.getRepository(User);
     const appointmentRepository = AppDataSource.getRepository(Appointment);
+
+    if (!user_id) {
+      throw new Error("User ID is required");
+    }
+
+    const foundUser = await userRepository.findOneBy({ user_id });
+
+    if (!foundUser) {
+      throw new Error("User not found");
+    }
 
     if (!appointment_id) {
       throw new Error("Appointment ID is required");
     }
 
-    const appointment = await appointmentRepository.findOneBy({ appointment_id });
+    const appointment = await appointmentRepository.findOne({
+      where: { appointment_id },
+      relations: { user: true },
+    });
 
     if (!appointment) {
       throw new Error("Appointment not found");
+    }
+
+    if (appointment.user.user_id !== user_id) {
+      throw new Error("You can only cancel your own appointments");
     }
 
     if (appointment.appointment_status == AppointmentStatus.CANCELED) {
