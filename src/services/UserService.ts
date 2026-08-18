@@ -40,7 +40,9 @@ export class UserService {
   async findAll(): Promise<User[]> {
     const userRepository = AppDataSource.getRepository(User);
 
-    const foundUsers = await userRepository.find();
+    const foundUsers = await userRepository.find({
+      where: { active: true },
+    });
 
     return foundUsers;
   }

@@ -6,9 +6,18 @@ export class AppointmentController {
     try {
       const appointmentService = new AppointmentService();
 
-      const { user_id, service_id, service_date } = req.body;
+      const user_id = req.user_id;
+      const { service_id, service_date } = req.body;
 
-      const appointment = await appointmentService.execute({ user_id, service_id, service_date });
+      if (!user_id) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const appointment = await appointmentService.execute({
+        user_id,
+        service_id,
+        service_date,
+      });
 
       return res.status(201).json(appointment);
     } catch (error) {
@@ -84,6 +93,48 @@ export class AppointmentController {
       });
 
       return res.status(200).json(appointment);
+    } catch (error) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  async confirm(req: Request, res: Response): Promise<Response> {
+    try {
+      const appointmentService = new AppointmentService();
+
+      const { user_id, appointment_id } = req.params;
+
+      if (typeof user_id !== "string" || typeof appointment_id !== "string") {
+        return res.status(400).json({ error: "user_id and appointment_id type must be String" });
+      }
+
+      const appointment = await appointmentService.confirm({ user_id, appointment_id });
+
+      return res.status(200).json({ appointment: appointment, message: "Sucessfully confirmed" });
+    } catch (error) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  async complete(req: Request, res: Response): Promise<Response> {
+    try {
+      const appointmentService = new AppointmentService();
+
+      const { user_id, appointment_id } = req.params;
+
+      if (typeof user_id !== "string" || typeof appointment_id !== "string") {
+        return res.status(400).json({ error: "user_id and appointment_id type must be String" });
+      }
+
+      const appointment = await appointmentService.complete({ user_id, appointment_id });
+
+      return res.status(200).json({ appointment: appointment, message: "Sucessfully completed" });
     } catch (error) {
       if (error instanceof Error) {
         return res.status(400).json({ error: error.message });

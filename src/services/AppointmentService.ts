@@ -17,8 +17,8 @@ type UpdateAppointmentDTO = {
   user_id: string;
 };
 
-type CancelAppointmentDTO = {
-  user_id: string;
+type ChangeStatusAppointmentDTO = {
+  user_id?: string;
   appointment_id: string;
 };
 
@@ -210,12 +210,8 @@ export class AppointmentService {
     return await appointmentRepository.save(appointment);
   }
 
-  async cancel({ user_id, appointment_id }: CancelAppointmentDTO): Promise<Appointment> {
+  async confirm({ appointment_id }: ChangeStatusAppointmentDTO): Promise<Appointment> {
     const appointmentRepository = AppDataSource.getRepository(Appointment);
-
-    if (!user_id) {
-      throw new Error("User ID is required");
-    }
 
     if (!appointment_id) {
       throw new Error("Appointment ID is required");
@@ -230,8 +226,51 @@ export class AppointmentService {
       throw new Error("Appointment not found");
     }
 
-    if (appointment.user.user_id !== user_id) {
-      throw new Error("You can only cancel your own appointments");
+    if (appointment.appointment_status !== AppointmentStatus.PENDING) {
+      throw new Error("Appointment must be PENDING to be completed");
+    }
+
+    appointment.appointment_status = AppointmentStatus.CONFIRMED;
+
+    return await appointmentRepository.save(appointment);
+  }
+
+  async complete({ appointment_id }: ChangeStatusAppointmentDTO): Promise<Appointment> {
+    const appointmentRepository = AppDataSource.getRepository(Appointment);
+
+    if (!appointment_id) {
+      throw new Error("Appointment ID is required");
+    }
+
+    const appointment = await appointmentRepository.findOneBy({ appointment_id });
+
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+
+    if (appointment.appointment_status !== AppointmentStatus.CONFIRMED) {
+      throw new Error("Appointment must be CONFIRMED to be completed");
+    }
+
+    appointment.appointment_status = AppointmentStatus.COMPLETED;
+
+    return await appointmentRepository.save(appointment);
+  }
+
+  async cancel({ appointment_id }: ChangeStatusAppointmentDTO): Promise<Appointment> {
+    const appointmentRepository = AppDataSource.getRepository(Appointment);
+
+    if (!appointment_id) {
+      throw new Error("Appointment ID is required");
+    }
+
+    const appointment = await appointmentRepository.findOne({
+      where: { appointment_id },
+      relations: { user: true },
+    });
+
+    if (!appointment) {
+      throw new Error("Appointment not found");
     }
 
     if (appointment.appointment_status == AppointmentStatus.CANCELED) {

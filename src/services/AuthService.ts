@@ -17,12 +17,16 @@ export class AuthService {
     const userRepository = AppDataSource.getRepository(User);
 
     const foundUser = await userRepository.findOne({
-      where: { email },
+      where: {
+        email,
+        active: true,
+      },
       select: {
         user_id: true,
         name: true,
         email: true,
         password_hash: true,
+        active: true,
       },
     });
 
