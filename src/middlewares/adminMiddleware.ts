@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../data-source.js";
 import { User, UserRole } from "../entities/user.js";
 
-export class adminMiddleware {
+export class AdminMiddleware {
   async validade(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const userRepository = AppDataSource.getRepository(User);
