@@ -7,15 +7,21 @@ import { ServiceController } from "./controllers/ServiceController.js";
 import { AdminMiddleware } from "./middlewares/adminMiddleware.js";
 import { AppointmentController } from "./controllers/AppointmentController.js";
 
+import swaggerUi from "swagger-ui-express";
+import { swaggerDocument } from "./docs/swagger.js";
+
 export const app: Express = express();
 
 app.use(express.json());
 
-cors({
+// Documentação da API
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.use(cors({
   origin: "http://localhost:3001",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
-});
+}));
 
 const userController = new UserController();
 const authController = new AuthController();
