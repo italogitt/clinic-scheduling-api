@@ -4,7 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts"
+    "test": "vitest --fileParallelism=false",
+    "dev": "tsx watch src/server.ts",
+    "typeorm": "tsx ./node_modules/typeorm/cli.js",
+    "schema:drop": "pnpm typeorm schema:drop -d src/data-source.ts",
+    "migration:generate": "pnpm typeorm migration:generate -d src/data-source.ts src/migrations/InitialMigration",
+    "migration:run": "pnpm typeorm migration:run -d src/data-source.ts",
+    "migration:revert": "pnpm typeorm migration:revert -d src/data-source.ts"
   },
   "keywords": [],
   "author": "",

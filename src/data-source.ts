@@ -15,10 +15,10 @@ export const AppDataSource = new DataSource({
   password: "admin_password_segura",
   database: "agendamento_clinica",
 
-  synchronize: true,
+  synchronize: false,
   logging: false,
 
   entities: [User, Service, Appointment],
-  migrations: [],
+  migrations: ["src/migrations/*.ts"],
   subscribers: [],
 });
