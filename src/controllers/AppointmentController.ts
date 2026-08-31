@@ -105,15 +105,15 @@ export class AppointmentController {
     try {
       const appointmentService = new AppointmentService();
 
-      const { user_id, appointment_id } = req.params;
+      const { appointment_id } = req.params;
 
-      if (typeof user_id !== "string" || typeof appointment_id !== "string") {
-        return res.status(400).json({ error: "user_id and appointment_id type must be String" });
+      if (!appointment_id || typeof appointment_id !== "string") {
+        return res.status(400).json({ error: "Invalid or missing appointment ID" });
       }
 
-      const appointment = await appointmentService.confirm({ user_id, appointment_id });
+      const appointment = await appointmentService.confirm({ appointment_id });
 
-      return res.status(200).json({ appointment: appointment, message: "Sucessfully confirmed" });
+      return res.status(200).json({ appointment: appointment, message: "Successfully confirmed" });
     } catch (error) {
       if (error instanceof Error) {
         return res.status(400).json({ error: error.message });
@@ -126,15 +126,15 @@ export class AppointmentController {
     try {
       const appointmentService = new AppointmentService();
 
-      const { user_id, appointment_id } = req.params;
+      const { appointment_id } = req.params;
 
-      if (typeof user_id !== "string" || typeof appointment_id !== "string") {
-        return res.status(400).json({ error: "user_id and appointment_id type must be String" });
+      if (!appointment_id || typeof appointment_id !== "string") {
+        return res.status(400).json({ error: "Invalid or missing appointment ID" });
       }
 
-      const appointment = await appointmentService.complete({ user_id, appointment_id });
+      const appointment = await appointmentService.complete({ appointment_id });
 
-      return res.status(200).json({ appointment: appointment, message: "Sucessfully completed" });
+      return res.status(200).json({ appointment: appointment, message: "Successfully completed" });
     } catch (error) {
       if (error instanceof Error) {
         return res.status(400).json({ error: error.message });
