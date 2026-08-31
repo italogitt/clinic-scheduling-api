@@ -19,12 +19,16 @@ const appointmentController = new AppointmentController();
 
 app.post("/users", (req, res) => userController.create(req, res));
 app.post("/login", (req, res) => authController.login(req, res));
-app.post("/services", authMiddleware.validate, (req, res) => serviceController.create(req, res));
+app.post("/services", authMiddleware.validate, adminMiddleware.validade, (req, res) =>
+  serviceController.create(req, res),
+);
 app.post("/appointments", authMiddleware.validate, (req, res) =>
   appointmentController.create(req, res),
 );
 
-app.get("/users", authMiddleware.validate, (req, res) => userController.findAll(req, res));
+app.get("/users", authMiddleware.validate, adminMiddleware.validade, (req, res) =>
+  userController.findAll(req, res),
+);
 app.get("/users/:user_id", authMiddleware.validate, (req, res) =>
   userController.findById(req, res),
 );
@@ -38,7 +42,7 @@ app.get("/appointments/users/:user_id", authMiddleware.validate, (req, res) =>
 );
 
 app.put("/users/:user_id", authMiddleware.validate, (req, res) => userController.update(req, res));
-app.put("/services/:service_id", authMiddleware.validate, (req, res) =>
+app.put("/services/:service_id", authMiddleware.validate, adminMiddleware.validade, (req, res) =>
   serviceController.update(req, res),
 );
 app.put("/appointments/user/:user_id", authMiddleware.validate, (req, res) =>
@@ -60,7 +64,7 @@ app.put(
 app.delete("/users/:user_id", authMiddleware.validate, (req, res) =>
   userController.delete(req, res),
 );
-app.delete("/services/:service_id", authMiddleware.validate, (req, res) =>
+app.delete("/services/:service_id", authMiddleware.validate, adminMiddleware.validade, (req, res) =>
   serviceController.delete(req, res),
 );
 app.delete("/appointments/:appointment_id", authMiddleware.validate, (req, res) =>
