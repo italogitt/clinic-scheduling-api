@@ -1,3 +1,4 @@
+import cors from "cors";
 import express, { type Express } from "express";
 import { UserController } from "./controllers/UserController.js";
 import { AuthController } from "./controllers/AuthController.js";
@@ -9,6 +10,12 @@ import { AppointmentController } from "./controllers/AppointmentController.js";
 export const app: Express = express();
 
 app.use(express.json());
+
+cors({
+  origin: "http://localhost:3001",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+});
 
 const userController = new UserController();
 const authController = new AuthController();
