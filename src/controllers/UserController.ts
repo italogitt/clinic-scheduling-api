@@ -1,16 +1,21 @@
 import type { Response, Request } from "express";
 import { UserService } from "../services/UserService.js";
+import { createUserSchema } from "../schemas/userSchema.js";
+import { ZodError } from "zod";
 
 export class UserController {
   async create(req: Request, res: Response): Promise<Response> {
     try {
       const userService = new UserService();
-      const { name, email, phone, password } = req.body;
+      const { name, email, phone, password } = createUserSchema.parse(req.body);
 
       const user = await userService.execute({ name, email, phone, password });
 
       return res.status(201).json(user);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.issues[0]?.message ?? "Validation error" });
+      }
       if (error instanceof Error) {
         return res.status(400).json({ error: error.message });
       }

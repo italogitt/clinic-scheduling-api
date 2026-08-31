@@ -1,5 +1,7 @@
 import type { Request, Response } from "express";
 import { AppointmentService } from "../services/AppointmentService.js";
+import { createAppointmentSchema, updateAppointmentSchema } from "../schemas/appointmentSchema.js";
+import { ZodError } from "zod";
 
 export class AppointmentController {
   async create(req: Request, res: Response): Promise<Response> {
@@ -7,7 +9,7 @@ export class AppointmentController {
       const appointmentService = new AppointmentService();
 
       const user_id = req.user_id;
-      const { service_id, service_date } = req.body;
+      const { service_id, service_date } = createAppointmentSchema.parse(req.body);
 
       if (!user_id) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -21,6 +23,9 @@ export class AppointmentController {
 
       return res.status(201).json(appointment);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.issues[0]?.message ?? "Validation error" });
+      }
       if (error instanceof Error) {
         return res.status(400).json({ error: error.message });
       }
@@ -73,17 +78,7 @@ export class AppointmentController {
         return res.status(400).json({ error: "Invalid or missing user ID" });
       }
 
-      const { service_id, appointment_id, service_date } = req.body;
-
-      if (
-        typeof service_id !== "string" ||
-        typeof appointment_id !== "string" ||
-        typeof service_date !== "string"
-      ) {
-        return res
-          .status(400)
-          .json({ error: "Invalid or missing service ID, appointmente ID and service date" });
-      }
+      const { service_id, appointment_id, service_date } = updateAppointmentSchema.parse(req.body);
 
       const appointment = await appointmentService.update({
         user_id,
@@ -94,6 +89,9 @@ export class AppointmentController {
 
       return res.status(200).json(appointment);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.issues[0]?.message ?? "Validation error" });
+      }
       if (error instanceof Error) {
         return res.status(400).json({ error: error.message });
       }
