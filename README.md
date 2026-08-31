@@ -13,7 +13,6 @@ Este projeto foi construído utilizando as seguintes tecnologias:
 - **[Zod](https://zod.dev/)** (Validação e tipagem de dados)
 - **[Argon2](https://github.com/ranisalt/node-argon2)** (Hashing de senhas)
 - **[JSON Web Token (JWT)](https://jwt.io/)** (Autenticação)
-- **[Vitest](https://vitest.dev/)** & **[Supertest](https://github.com/ladjs/supertest)** (Testes de integração)
 - **[Swagger](https://swagger.io/)** (Documentação interativa da API)
 
 ---
@@ -78,17 +77,6 @@ A documentação interativa de todas as rotas, regras e *payloads* necessários 
 
 Com a aplicação rodando, acesse em seu navegador:
 👉 **[http://localhost:3000/api-docs](http://localhost:3000/api-docs)**
-
----
-
-## 🧪 Testes
-
-A API possui uma suíte completa de testes de integração, rodando de forma isolada com banco de dados limpo a cada execução.
-
-Para rodar os testes:
-```bash
-pnpm run test
-```
 
 ---
 
