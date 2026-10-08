@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import { User } from "./entities/user.js";
 import { Service } from "./entities/service.js";
 import { Appointment } from "./entities/appointment.js";
+import { PhoneAuthCode } from "./entities/phoneAuthCode.js";
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: false,
 
-  entities: [User, Service, Appointment],
+  entities: [User, Service, Appointment, PhoneAuthCode],
   migrations: ["src/migrations/*.ts"],
   subscribers: [],
 });
