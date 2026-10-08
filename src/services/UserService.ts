@@ -1,40 +1,64 @@
 import { AppDataSource } from "../data-source.js";
-import { User } from "../entities/user.js";
+import { User, UserRole } from "../entities/user.js";
 import { hashPassword } from "./ArgonService.js";
 
-type CreateUserRequest = Pick<User, "name" | "email" | "phone"> & { password: string };
+type CreateUserRequest = {
+  name: string;
+  phone: string;
+  email?: string;
+  password?: string;
+  role?: UserRole;
+};
 type UserSelectedId = { user_id: string };
-type UpdateUserRequest = Partial<Pick<User, "name" | "email" | "phone">>;
+type UpdateUserRequest = {
+  name?: string;
+  phone?: string;
+  email?: string;
+  password?: string;
+};
 
 export class UserService {
   async execute({
     name,
-    email,
     phone,
+    email,
     password,
+    role = UserRole.CLIENT,
   }: CreateUserRequest): Promise<Omit<User, "password_hash">> {
     const userRepository = AppDataSource.getRepository(User);
 
-    const userAlreadyExists = await userRepository.findOneBy({ email });
-
-    if (userAlreadyExists) {
-      throw new Error("Email already registered");
+    if (role == UserRole.ADMIN) {
+      if (!email || !password) {
+        throw new Error("Admin users require email and password");
+      }
     }
 
-    const hashedPassword = await hashPassword(password);
+    const phoneAlreadyExists = await userRepository.findOneBy({ phone });
+    if (phoneAlreadyExists) {
+      throw new Error("Phone already registred");
+    }
+
+    if (email) {
+      const emailAlreadyExists = await userRepository.findOneBy({ email });
+      if (emailAlreadyExists) {
+        throw new Error("Email already registred");
+      }
+    }
+
+    const password_hash = password ? await hashPassword(password) : null;
 
     const user = userRepository.create({
       name,
-      email,
       phone,
-      password_hash: hashedPassword,
+      email: email ?? null,
+      password_hash,
+      role,
     });
 
     await userRepository.save(user);
 
-    const { password_hash, ...userWhitoutPassword } = user;
-
-    return userWhitoutPassword;
+    const { password_hash: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   async findAll(): Promise<User[]> {
